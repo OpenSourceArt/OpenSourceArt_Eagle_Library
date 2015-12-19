@@ -245,7 +245,7 @@ numeric string AttributesList[];    // Sorted list of all attributes found in th
 numeric string PartAttributes[];    // Adjusted list of attributes per part.
 
 enum { ltParts, ltValues };         // List Types
-enum { ofText, ofCSV, ofHTML };     // Output Formats
+enum { ofText, ofCSV, ofHTML, ofMD };     // Output Formats
 int ListType = 0;
 int OutputFormat = 0;
 
@@ -493,6 +493,40 @@ string MakeListText(void)
   return List;
 }
 
+string MakeListMD (void)
+{
+  string List;
+  int numHeaders;
+
+  for (int l = 0; Lines[l]; l++)
+  {
+    string a [];
+    int n = strsplit(a, Lines[l], '\t');
+    if (l == 0)
+      numHeaders = n;
+    else
+      n = numHeaders; // for the hidden key!
+
+    // On each row print a leading |
+    List += "|";
+
+    // Loop through the first 5 columns and print a trailing |
+    for (int i = 0; i < 5; i ++)
+      List += a[i] + "|";
+    List += "\n";
+
+    // After printing the header row we need to print the header seperator row.
+    if (l == 0)
+    {
+      List += "|";
+      for (int i = 0; i < 5; i ++)
+         List += "---|";
+      List += "\n";
+    }
+
+  }
+  return List;
+}
 
 // 2008-11-24 Christian Schlittler:
 // Make comma-serparated list, with all values double-quoted.
@@ -554,6 +588,7 @@ string MakeList (void)
     case ofText: return MakeListText(); break;
     case ofCSV:  return MakeListCSV(); break;
     case ofHTML: return MakeListHTML(); break;
+    case ofMD: return MakeListMD(); break;
   }
   return "";
 }
@@ -564,7 +599,7 @@ void ViewList (void)
   dlgDialog (tr ("Bill Of Material - Preview"))
   {
     string s = MakeList ();
-    if (OutputFormat == ofText || OutputFormat == ofCSV)
+    if (OutputFormat == ofText || OutputFormat == ofCSV || OutputFormat == ofMD)
       s = "<pre>" + s + "</pre>";
     dlgHBoxLayout dlgSpacing (400);
     dlgHBoxLayout
@@ -594,6 +629,7 @@ void SaveList (void)
     case ofText: FileExt = ".txt"; break;
     case ofHTML: FileExt = ".html"; break;
     case ofCSV:  FileExt = ".csv"; break;
+    case ofMD:   FileExt = ".md"; break;
   }
   schematic(SCH) FileName = filesetext (SCH.name, FileExt);
   FileName = dlgFileSave (tr ("Save Bill Of Material"), FileName);
@@ -680,6 +716,7 @@ dlgDialog (tr ("Bill Of Material"))
       // 2008-11-24 cwi: New format added.
       dlgRadioButton(tr ("&CSV"), OutputFormat);
       dlgRadioButton(tr ("&HTML"), OutputFormat);
+      dlgRadioButton(tr ("&MD"), OutputFormat);
     }
     dlgStretch(1);
   }
