@@ -12,3 +12,4 @@ Parts
 |BATTERY-AAAA|KEYSTONE-AAAA-SMD|Keystone Surface Mount AAAA Battery Clips|
 |MR503|MR503|MR503 Alcohol Sensor|
 |ZX80-B-5P|ZX80-B-5P|Hirose upright female mini USB B|
+|MCP17000|SOT23-6|Microchip MCP1700 LDO|
